@@ -1,10 +1,9 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"golang/gorm_use"
-	"time"
+	"golang/gorm_use/models"
 
 	//"golang/gorm_use/models"
 	"gorm.io/gorm"
@@ -26,19 +25,15 @@ func main() {
 		return
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Second)
-	db = db.WithContext(ctx)
+	user := models.User{}
+	stmt := db.Session(&gorm.Session{DryRun: true}).First(&user, 1).Statement
+	fmt.Println(stmt.SQL.String())
+	fmt.Println(stmt.Vars)
 
-	t := test{sli: []string{"y", "a", "n", "g"}}
-	t1 := test{sli: t.sli}
-
-	fmt.Println(t.sli, &t.sli[0])
-	fmt.Println(t1.sli, &t1.sli[0])
-
-	t1.sli[0] = "xiong"
-
-	fmt.Println(t.sli, &t.sli[0])
-	fmt.Println(t1.sli, &t1.sli[0])
+	db.Dialector.Explain(stmt.SQL.String(), stmt.Vars...)
+	fmt.Println("test")
+	//ctx, _ := context.WithTimeout(context.Background(), time.Second)
+	//db = db.WithContext(ctx)
 
 	//var result []models.Result
 	//data.JoinTableFind(db, &result)
